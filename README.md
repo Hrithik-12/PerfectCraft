@@ -37,3 +37,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## natural library docs 
 Read this for better understanding https://naturalnode.github.io/natural/stemmers.html
+## pdf parsing 
+trying this repo for idea https://github.com/tuffstuff9/nextjs-pdf-parser
