@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "compromise": "^14.14.4",
     "natural": "^8.1.0",
     "next": "15.4.6",
     "pdf-lib": "^1.17.1",
