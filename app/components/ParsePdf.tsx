@@ -18,7 +18,7 @@ export default function TestPdfPage() {
     if (!file) return;
 
     setLoading(true);
-    const formData = new FormData();
+    const formData = new FormData(); 
     formData.append('pdf', file);
 
     try {

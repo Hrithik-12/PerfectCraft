@@ -15,11 +15,11 @@ export function tokenizeText(text: string): TokenizedOutput {
   const doc = nlp(text);
 
   // Extract all nouns, then get a unique list
-  const nouns = doc.nouns().out('array');
-  const uniqueNouns = [...new Set(nouns)];
+  const nouns = doc.nouns().out('array') as string[];
+  const uniqueNouns = [...new Set(nouns) ];
 
   // Extract all verbs, then get a unique list
-  const verbs = doc.verbs().out('array');
+  const verbs = doc.verbs().out('array') as string[];
   const uniqueVerbs = [...new Set(verbs)];
   
   // Extract all sentences
