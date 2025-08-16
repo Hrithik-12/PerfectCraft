@@ -377,7 +377,7 @@ ${resumeJsonString}
 **Your Task:**
 1. Analyze the job description's nouns and verbs to identify the most important skills, technologies, and responsibilities.
 2. For **each section** of the resume (personalInfo, education, experience, projects, skills, certifications, etc.):
-  - Remove all invalid characters. All characters other than alphabets are invalid.
+  - Remove all invalid characters. All characters other than alphabets and spaces are invalid.
    - Rephrase and enhance the existing content so it better matches the job description.
    - Naturally weave in missing but relevant keywords **if they are supported by the resume**.
    - Maintain factual accuracy — do not invent qualifications or experiences.
