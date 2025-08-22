@@ -132,7 +132,6 @@
 //   return finalOutput;
 // }
 
-
 // // Helper function to build the detailed prompt for the AI
 // export function buildPrompt(resumeData: any, jdData: any): string {
 //   // Convert the JSON data to string format for the prompt
@@ -175,8 +174,7 @@
 //   `;
 // }
 
-
-import nlp from 'compromise';
+import nlp from "compromise";
 
 interface TokenizedOutput {
   nouns: string[];
@@ -191,7 +189,7 @@ interface TokenizedOutput {
  * Fixes spacing issues and improves newline detection.
  */
 export function extractTextFromPdfData(pdfData: any): string {
-  let fullText = '';
+  let fullText = "";
   if (!pdfData.Pages) return fullText;
 
   pdfData.Pages.forEach((page: any) => {
@@ -206,25 +204,24 @@ export function extractTextFromPdfData(pdfData: any): string {
     texts.forEach((textEl: any) => {
       // Improved line break detection (smaller Y difference threshold)
       if (lastY !== -1 && Math.abs(textEl.y - lastY) > 0.5) {
-        fullText += '\n';
+        fullText += "\n";
       }
       lastY = textEl.y;
 
       if (textEl.R && textEl.R.length > 0) {
         // Add spaces between runs to avoid squished words
-        fullText += textEl.R.map((run: any) => decodeURIComponent(run.T)).join(' ');
-        fullText += ' '; // extra safety space between elements
+        fullText += textEl.R.map((run: any) => decodeURIComponent(run.T)).join(
+          " "
+        );
+        fullText += " "; // extra safety space between elements
       }
     });
 
-    fullText += '\n';
+    fullText += "\n";
   });
 
   // Normalize spacing and trim
-  return fullText
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s+/g, '\n')
-    .trim();
+  return fullText.replace(/\s+/g, " ").replace(/\n\s+/g, "\n").trim();
 }
 
 /**
@@ -232,9 +229,9 @@ export function extractTextFromPdfData(pdfData: any): string {
  */
 function tokenizeText(text: string): TokenizedOutput {
   const doc = nlp(text);
-  const nouns = [...new Set(doc.nouns().out('array') as string[])];
-  const verbs = [...new Set(doc.verbs().out('array') as string[])];
-  const sentences = doc.sentences().out('array');
+  const nouns = [...new Set(doc.nouns().out("array") as string[])];
+  const verbs = [...new Set(doc.verbs().out("array") as string[])];
+  const sentences = doc.sentences().out("array");
   return { nouns, verbs, sentences };
 }
 
@@ -243,23 +240,38 @@ function tokenizeText(text: string): TokenizedOutput {
  */
 export function getStructuredResumeTokens(text: string) {
   const sectionHeaders: { [key: string]: string[] } = {
-    experience: ['experience', 'work experience', 'professional experience', 'employment history'],
-    education: ['education', 'academic details', 'academic qualifications'],
-    projects: ['projects', 'personal projects', 'academic projects'],
-    skills: ['skills', 'technical skills', 'proficiencies', 'core competencies'],
+    experience: [
+      "experience",
+      "work experience",
+      "professional experience",
+      "employment history",
+    ],
+    education: ["education", "academic details", "academic qualifications"],
+    projects: ["projects", "personal projects", "academic projects"],
+    skills: [
+      "skills",
+      "technical skills",
+      "proficiencies",
+      "core competencies",
+    ],
   };
 
-  const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line);
   const sections: { [key: string]: string[] } = { personalInfo: [] };
-  let currentSection: string = 'personalInfo';
+  let currentSection: string = "personalInfo";
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     let isHeader = false;
-    const normalizedLine = line.toLowerCase().replace(/[^a-z]/g, '');
+    const normalizedLine = line.toLowerCase().replace(/[^a-z]/g, "");
 
     if (line.length < 50) {
       for (const key in sectionHeaders) {
-        const normalizedKeywords = sectionHeaders[key].map(h => h.replace(/[^a-z]/g, ''));
+        const normalizedKeywords = sectionHeaders[key].map((h) =>
+          h.replace(/[^a-z]/g, "")
+        );
         if (normalizedKeywords.includes(normalizedLine)) {
           currentSection = key;
           sections[currentSection] = [];
@@ -278,7 +290,7 @@ export function getStructuredResumeTokens(text: string) {
   const tempTokenizedSections: { [key: string]: TokenizedOutput } = {};
   for (const key in sections) {
     if (sections[key] && sections[key].length > 0) {
-      const sectionText = sections[key].join('\n');
+      const sectionText = sections[key].join("\n");
       tempTokenizedSections[key] = tokenizeText(sectionText);
     }
   }
@@ -346,7 +358,6 @@ export function getStructuredResumeTokens(text: string) {
 // `;
 // }
 
-
 export function buildPrompt(resumeData: any, jdData: any): string {
   const resumeJsonString = JSON.stringify(resumeData, null, 2);
   const jdJsonString = JSON.stringify(jdData, null, 2);
@@ -366,10 +377,12 @@ ${resumeJsonString}
 **Your Task:**
 1. Analyze the job description's nouns and verbs to identify the most important skills, technologies, and responsibilities.
 2. For **each section** of the resume (personalInfo, education, experience, projects, skills, certifications, etc.):
+  - Remove all invalid characters. All characters other than alphabets and spaces are invalid.
    - Rephrase and enhance the existing content so it better matches the job description.
    - Naturally weave in missing but relevant keywords **if they are supported by the resume**.
    - Maintain factual accuracy — do not invent qualifications or experiences.
    - Keep the section's original meaning but make it more impactful and ATS-friendly.
+   
 3. Preserve the same section structure as the input resume.
 
 **Output Format:**
@@ -379,7 +392,7 @@ Return ONLY a valid JSON object in this structure:
     "personalInfo": ["string", "string", ...],
     "education": ["string", "string", ...],
     "experience": ["string", "string", ...],
-    "projects": ["string", "string", ...],
+    "projects": [{projectName:string,description:["string","string",...]}, {projectName:string,description:["string","string",...]}, ...],
     "skills": ["string", "string", ...],
     "certifications": ["string", "string", ...]
   }
